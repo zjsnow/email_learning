@@ -3,8 +3,8 @@ from email.header import Header
 from email.mime.text import MIMEText
 import smtplib
 
-from_addr='me@163.com'#输入email的地址和密码(对于163邮箱来说，不是你的登陆密码，而是授权码）
-password='*******'
+from_addr='me@163.com'#输入email的地址
+password='*******' #输入口令(注意不是你的登陆密码，而是授权码）
 to_addr='friend@qq.com'#输入收件人地址
 smtp_server= 'smtp.163.com'##输入SMTP服务器地址，如是163邮箱为smtp.163.com
 
@@ -20,5 +20,5 @@ server=smtplib.SMTP(smtp_server,25) #SMTP协议的默认端口是25
 server.set_debuglevel(1)  #打印出所有SMTP服务器交互的信息
 server.login(from_addr,password) #登陆SMTP服务器
 server.sendmail(from_addr,[to_addr],msg.as_string()) #发邮件。收件人可以为多个，所以是一个list，as_string把MIMEText对象变为str
-server.quit()
+server.quit()#关闭连接
 

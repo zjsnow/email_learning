@@ -35,9 +35,12 @@
 
 **smtp.py**:发送纯文本邮件程序
 
-**smtp_pluse.py**:发送文本加附件的程序
+**smtp_pluse.py**:发送文本加附件的邮件程序
 
-主要利用email模块构造邮件，smtplib模块发送文件
+发送邮件分两步：
+
+1. 用email构造邮件
+2. 用smtplib发送邮件
 
 Python的smtplib发送邮件十分简单，只要掌握了各种邮件类型的构造方法，正确设置好邮件头，就可以顺利发出。构造一个邮件对象就是一个Messag对象，如果构造一个MIMEText对象，就表示一个文本邮件对象，如果构造一个MIMEImage对象，就表示一个作为附件的图片，要把多个对象组合起来，就用MIMEMultipart对象，而MIMEBase可以表示任何对象。它们的继承关系如下：
 
@@ -62,7 +65,57 @@ Python的smtplib发送邮件十分简单，只要掌握了各种邮件类型的�
 
 ## 三、POP3收取邮件
 
-未完待续....
+**pop.py**:获取最新的6封邮件并解析输出
+
+POP3协议收取的不是一个已经可以阅读的邮件本身，而是邮件的原始文本，这和SMTP协议很像，SMTP发送的也是经过编码后的一大段文本。要把POP3收取的文本变成可以阅读的邮件，还需要用email模块提供的各种类来解析原始文本，变成可阅读的邮件对象。
+
+收取邮件分两步：
+
+1. 用poplib把邮件的原始文本下载到本地
+2. 用email解析原始文本，还原为邮件对象
+
+用poplib获取邮件其实很简单,难点在于把邮件的原始内容解析为可以阅读的邮件对象。
+
+我们可以先把邮件内容解析为Message对象，但这个Message对象本身可能是一个MIMEMultipart对象，即嵌套了其他MIMEBase对象，嵌套可能还不止一层，可以采用递归的方法，依次解析。
+
+## 四、对于邮件结构的理解
+
+在pop.py程序中，通过print(msg_content)可观察到邮件的原始文本，下面我对邮件的结构和重要字段进行解释
+
+-  邮件包括邮件头和邮件体，由空行隔开。邮件头以“字段名：字段值”的格式出现，一些主要的邮件头字段：
+
+  1. Received:基本格式为Received from A by B for C,其中A为发送方的域名，B为接收方的域名，C为收件人的邮箱地址。通常会有多个Received表明邮件经过的传输路径，但注意是要从下往上的顺序。
+  2. From:制定发件人地址
+  3. To:指定收件人地址
+  4. Subject:指定邮件的主题，如果主题内容中包含有ASCII码以外的字符，通常要对其内容进行编码。
+  5. Date:邮件发送的地址
+  6. cc:邮件抄送的地址
+  7. bcc:邮件的暗送地址
+
+-  对于一封MIME邮件，它在RFC822文档中对邮件的头字段进行了扩展：
+
+  1. MIME-Version:MIME协议的版本
+
+  2. Content-Type:邮件体的MIME类型。有“主类型/子类型”构成，主类型有text,image,audio,video,application,multipart,message等，每个主类型都有多个子类型，比如test类型包含plain,html,xml,css等子类型，各个类型所带的参数如下
+
+     ```
+     主类型        参数       含义
+     text         charset   编码方式
+     image         name     图片文件名
+     application   name     应用程序的文件名
+     mltipart     boundary  MIME消息间的分隔符
+     ```
+
+- 邮件体的类型由邮件头的Content-Type定义，当出现的类型是multipart时，邮件体会被分成多段，每段会包含段头和段体两部分，也由空行隔开。常见的multipart类型有三种：multipart/mixed, multipart/related和multipart/alternative，如果在邮件中要添加附件，必须定义multipart/mixed段；如果存在内嵌资源，至少要定义multipart/related段；如果纯文本与超文本共存，至少要定义multipart/alternative段。每个段都有自己的属性，由段头的字段来说明，主要包括：
+
+  1. Content-Type：段体的类型，注意与邮件头的类型区别开，这里是指该段的类型，而前面是整个邮件体的类型。
+  2. Content-Transfer-Encoding ：段体的邮件编码方式，通常是base64。
+  3. Content-Disposition：用于指定邮件阅读程序处理数据内容的方式，有inline 和attachment 两种标准方式，inline 表示直接处理，而attachment 表示当做附件处理。如果将Content-Disposition 设置attachment，在其后还可以指定filename 属性。
+
+  ​
+
+
+
 
 
 
@@ -76,7 +129,7 @@ Python的smtplib发送邮件十分简单，只要掌握了各种邮件类型的�
 
 http://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000
 
-
+2  MIME协议分析  http://blog.csdn.net/bripengandre/article/details/2192982
 
 
 
