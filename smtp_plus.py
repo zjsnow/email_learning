@@ -5,9 +5,9 @@ from email.mime.multipart import MIMEMultipart,MIMEBase
 from email import encoders
 import smtplib
 
-from_addr='18810940231@163.com'#输入email的地址
-password='oppo7226' #输入口令(注意不是你的登陆密码，而是授权码）
-to_addr='826580369@qq.com'#输入收件人地址
+from_addr='me@163.com'#输入email的地址
+password='*******' #输入口令(注意不是你的登陆密码，而是授权码）
+to_addr='friend@qq.com'#输入收件人地址
 smtp_server= 'smtp.163.com'##输入SMTP服务器地址，如是163邮箱为smtp.163.com
 
 msg=MIMEMultipart()  #构造MIMEMultipart对象作为邮件本身，包含邮件正文+附件
